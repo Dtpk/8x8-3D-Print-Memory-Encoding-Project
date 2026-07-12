@@ -1,0 +1,158 @@
+// --- 1. USER INPUT ---
+YOUR_TEXT = "testingsquare"; 
+
+// --- 2. HARDWARE TOGGLES ---
+ENABLE_KEYCHAIN_HOLE = false;
+ENABLE_RAISED_NOTCH  = true; // This now generates the "L" Frame around the first bit
+
+// --- 3. CONFIGURATION ---
+GRID_SIZE = 8;
+CELL_SIZE = 4.0;       // 4mm grid cell spacing
+PLATE_THICKNESS = 2.0; 
+SHEET_THICKNESS = 0.4; 
+
+PELLET_HOLE_R = 1.0;  
+DASH_W = 2.0;          
+DASH_H = 0.6;          
+
+BORDER = ENABLE_KEYCHAIN_HOLE ? 4.0 : 0.0;
+TOTAL_W = (GRID_SIZE * CELL_SIZE) + BORDER;
+TOTAL_H = GRID_SIZE * CELL_SIZE;
+
+// --- 4. AUDITED HUFFMAN KEY LOOKUP ---
+function get_huffman(char) = 
+    (char == " ") ? [0,0,0] :
+    (char == "P") ? [0,0,1,0,0,0,0,0] :
+    (char == "O") ? [0,0,1,0,0,0,0,1] :
+    (char == "j") ? [0,0,1,0,0,0,1,0] :
+    (char == "S") ? [0,0,1,0,0,0,1,1] :
+    (char == "g") ? [0,0,1,0,0,1] :
+    (char == "m") ? [0,0,1,0,1] :
+    (char == "r") ? [0,0,1,1] :
+    (char == "s") ? [0,1,0,0] :
+    (char == "?") ? [0,1,0,1,0,0,0,0,0] :
+    (char == "!") ? [0,1,0,1,0,0,0,0,1] :
+    (char == "A") ? [0,1,0,1,0,0,1] :
+    (char == "I") ? [0,1,0,1,0,0,1,0] :
+    (char == "X") ? [0,1,0,1,0,0,1,1,0] :
+    (char == "Q") ? [0,1,0,1,0,0,1,1,1] :
+    (char == "T") ? [0,1,0,1,0,1,0,0] :
+    (char == "E") ? [0,1,0,1,0,1,0,1] :
+    (char == "k") ? [0,1,0,1,0,1,1] :
+    (char == "u") ? [0,1,0,1,1] :
+    (char == "n") ? [0,1,1,0] :
+    (char == "i") ? [0,1,1,1] :
+    (char == "o") ? [1,0,0,0] :
+    (char == "3") ? [1,0,0,1,0,0,0,0,0] :
+    (char == "0") ? [1,0,0,1,0,0,0,0,1] :
+    (char == "7") ? [1,0,0,1,0,0,0,1,0] :
+    (char == "6") ? [1,0,0,1,0,0,0,1,1] :
+    (char == "v") ? [1,0,0,1,0,0,1] :
+    (char == "p") ? [1,0,0,1,0,1] :
+    (char == "c") ? [1,0,0,1,1] :
+    (char == "a") ? [1,0,1,0] :
+    (char == "5") ? [1,0,1,1,0,0,0,0,0] :
+    (char == "4") ? [1,0,1,1,0,0,0,0,1] :
+    (char == "x") ? [1,0,1,1,0,0,0,1] :
+    (char == "K") ? [1,0,1,1,0,0,1,0,0] :
+    (char == "J") ? [1,0,1,1,0,0,1,0,1] :
+    (char == "9") ? [1,0,1,1,0,0,1,1,0] :
+    (char == "8") ? [1,0,1,1,0,0,1,1,1] :
+    (char == "Y") ? [1,0,1,1,0,1,0,0,0] :
+    (char == "V") ? [1,0,1,1,0,1,0,0,1] :
+    (char == "-") ? [1,0,1,1,0,1,0,1,0] :
+    (char == "2") ? [1,0,1,1,0,1,0,1,1] :
+    (char == "b") ? [1,0,1,1,0,1,1] :
+    (char == "d") ? [1,0,1,1,1] :
+    (char == "t") ? [1,1,0,0] :
+    (char == "y") ? [1,1,0,1,0,0,0] :
+    (char == "1") ? [1,1,0,1,0,0,1,0,0] : 
+    (char == "q") ? [1,1,0,1,0,0,1,0,1] :
+    (char == "L") ? [1,1,0,1,0,0,1,1,0] :
+    (char == "G") ? [1,1,0,1,0,0,1,1,1] :
+    (char == "f") ? [1,1,0,1,0,1] :
+    (char == "l") ? [1,1,0,1,1] :
+    (char == "W") ? [1,1,1,0,0,0,0,0,0] :
+    (char == "U") ? [1,1,1,0,0,0,0,0,1] :
+    (char == "F") ? [1,1,1,0,0,0,0,1,0] :
+    (char == "D") ? [1,1,1,0,0,0,0,1,1] :
+    (char == "w") ? [1,1,1,0,0,0,1] :
+    (char == "C") ? [1,1,1,0,0,1,0,0,0] :
+    (char == "B") ? [1,1,1,0,0,1,0,0,1] :
+    (char == ".") ? [1,1,1,0,0,1,0,1,0] :
+    (char == "R") ? [1,1,1,0,0,1,0,1,1] :
+    (char == "H") ? [1,1,1,0,0,1,1,0,0] :
+    (char == "Z") ? [1,1,1,0,0,1,1,0,1,0] :
+    (char == "z") ? [1,1,1,0,0,1,1,0,1,1] :
+    (char == "N") ? [1,1,1,0,0,1,1,1,0] :
+    (char == "M") ? [1,1,1,0,0,1,1,1,1] :
+    (char == "h") ? [1,1,1,0,1] :
+    (char == "e") ? [1,1,1,1] :
+    [0]; 
+
+// --- 5. FLATTENING AND BITSTREAM LOGIC ---
+function encode_string(str, idx=0, current=[]) = 
+    idx >= len(str) ? current : 
+    encode_string(str, idx + 1, concat(current, get_huffman(str[idx])));
+
+BIT_STREAM = encode_string(YOUR_TEXT);
+
+function get_bit(x, y) = 
+    let(bit_index = y * GRID_SIZE + x)
+    bit_index < len(BIT_STREAM) ? BIT_STREAM[bit_index] : 0; 
+
+// --- 6. 3D GEOMETRY GENERATOR ---
+union() {
+    // Main Body Matrix
+    color([0.2, 0.2, 0.2]) { 
+        difference() {
+            cube([TOTAL_W, TOTAL_H, PLATE_THICKNESS]);
+            
+            // Generate Data Holes
+            for (y = [0 : GRID_SIZE-1]) {
+                for (x = [0 : GRID_SIZE-1]) {
+                    pos_x = (x * CELL_SIZE) + (CELL_SIZE / 2) + BORDER;
+                    pos_y = ((GRID_SIZE - 1 - y) * CELL_SIZE) + (CELL_SIZE / 2);
+                    
+                    bit = get_bit(x, y);
+                    
+                    translate([pos_x, pos_y, -1]) { 
+                        if (bit == 1) {
+                            cylinder(h = PLATE_THICKNESS + 2, r = PELLET_HOLE_R, $fn=30);
+                        } else {
+                            translate([-DASH_W/2, -DASH_H/2, 0])
+                                cube([DASH_W, DASH_H, PLATE_THICKNESS + 2]);
+                        }
+                    }
+                }
+            }
+            
+            // Keychain Hole (Cleanly isolated in the extra left-side margin)
+            if (ENABLE_KEYCHAIN_HOLE) {
+                translate([BORDER / 2, TOTAL_H - (BORDER / 2), -1])
+                    cylinder(h = PLATE_THICKNESS + 2, r = 1.25, $fn=30); 
+            }
+        }
+    }
+
+    // NEW FEATURE: "L" Frame Bump around cell (0,0) [Top-Left Data Position]
+    if (ENABLE_RAISED_NOTCH) {
+        color([0.8, 0.2, 0.2]) { // Highlighted Red in OpenSCAD
+            // Left Vertical leg of the L
+            translate([BORDER + 0.2, TOTAL_H - CELL_SIZE + 0.2, PLATE_THICKNESS])
+                cube([0.6, CELL_SIZE - 0.4, 0.8]);
+            
+            // Top Horizontal leg of the L
+            translate([BORDER + 0.2, TOTAL_H - 0.8, PLATE_THICKNESS])
+                cube([CELL_SIZE - 0.4, 0.6, 0.8]);
+        }
+    }
+}
+
+// Visual Transparent Overlays (Can be toggled or stripped in your slicer)
+color([0, 1, 0, 0.2]) {
+    translate([0, 0, -SHEET_THICKNESS])
+        cube([TOTAL_W, TOTAL_H, SHEET_THICKNESS]);
+    translate([0, 0, PLATE_THICKNESS])
+        cube([TOTAL_W, TOTAL_H, SHEET_THICKNESS]);
+}
