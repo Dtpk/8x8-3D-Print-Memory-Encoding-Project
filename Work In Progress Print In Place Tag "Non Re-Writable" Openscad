@@ -8,7 +8,7 @@ ENABLE_RAISED_NOTCH  = true; // This now generates the "L" Frame around the firs
 // --- 3. CONFIGURATION ---
 GRID_SIZE = 8;
 CELL_SIZE = 4.0;       // 4mm grid cell spacing
-PLATE_THICKNESS = 2.0; 
+PLATE_THICKNESS = 0.5;   // determines how thick you should do final top bottom layer adjustment in the slicer
 SHEET_THICKNESS = 0.4; 
 
 PELLET_HOLE_R = 1.0;  
