@@ -2,7 +2,7 @@
 YOUR_TEXT = "testingsquare"; 
 
 // --- 2. HARDWARE TOGGLES ---
-ENABLE_KEYCHAIN_HOLE = false;
+ENABLE_KEYCHAIN_HOLE = true; // Set to true to test the cut-through
 ENABLE_RAISED_NOTCH  = true; // This now generates the "L" Frame around the first bit
 
 // --- 3. CONFIGURATION ---
@@ -26,7 +26,7 @@ function get_huffman(char) =
     (char == "O") ? [0,0,1,0,0,0,0,1] :
     (char == "j") ? [0,0,1,0,0,0,1,0] :
     (char == "S") ? [0,0,1,0,0,0,1,1] :
-    (char == "g") ? [0,0,1,0,0,1] :
+    (char == "g") ? [0,0,1,0,1,1] :
     (char == "m") ? [0,0,1,0,1] :
     (char == "r") ? [0,0,1,1] :
     (char == "s") ? [0,1,0,0] :
@@ -103,12 +103,14 @@ function get_bit(x, y) =
 
 // --- 6. 3D GEOMETRY GENERATOR ---
 union() {
-    // Main Body Matrix
+    
+    // 1. MAIN BODY: Gray plate with data holes AND keychain hole subtracted
     color([0.2, 0.2, 0.2]) { 
         difference() {
+            // Raw Main Body Plate
             cube([TOTAL_W, TOTAL_H, PLATE_THICKNESS]);
             
-            // Generate Data Holes
+            // Generate Data Holes (Only inside the main body)
             for (y = [0 : GRID_SIZE-1]) {
                 for (x = [0 : GRID_SIZE-1]) {
                     pos_x = (x * CELL_SIZE) + (CELL_SIZE / 2) + BORDER;
@@ -127,15 +129,37 @@ union() {
                 }
             }
             
-            // Keychain Hole (Cleanly isolated in the extra left-side margin)
+            // Keychain Hole cut through the main plate
             if (ENABLE_KEYCHAIN_HOLE) {
                 translate([BORDER / 2, TOTAL_H - (BORDER / 2), -1])
                     cylinder(h = PLATE_THICKNESS + 2, r = 1.25, $fn=30); 
             }
         }
     }
+    
+    // 2. TRANSPARENT OVERLAYS: Clean solid sheets with ONLY the keychain hole cut out
+    color([0, 1, 0, 0.2]) {
+        difference() {
+            // Raw transparent sheets (grouped together)
+            union() {
+                // Bottom sheet
+                translate([0, 0, -SHEET_THICKNESS])
+                    cube([TOTAL_W, TOTAL_H, SHEET_THICKNESS]);
+                // Top sheet
+                translate([0, 0, PLATE_THICKNESS])
+                    cube([TOTAL_W, TOTAL_H, SHEET_THICKNESS]);
+            }
+            
+            // Cut keychain hole through BOTH transparent sheets (if active)
+            if (ENABLE_KEYCHAIN_HOLE) {
+                total_depth = PLATE_THICKNESS + (SHEET_THICKNESS * 2) + 2;
+                translate([BORDER / 2, TOTAL_H - (BORDER / 2), -SHEET_THICKNESS - 1])
+                    cylinder(h = total_depth, r = 1.25, $fn=30); 
+            }
+        }
+    }
 
-    // NEW FEATURE: "L" Frame Bump around cell (0,0) [Top-Left Data Position]
+    // 3. "L" FRAME BUMP: Positioned on top of the system
     if (ENABLE_RAISED_NOTCH) {
         color([0.8, 0.2, 0.2]) { // Highlighted Red in OpenSCAD
             // Left Vertical leg of the L
@@ -147,12 +171,4 @@ union() {
                 cube([CELL_SIZE - 0.4, 0.6, 0.8]);
         }
     }
-}
-
-// Visual Transparent Overlays (Can be toggled or stripped in your slicer)
-color([0, 1, 0, 0.2]) {
-    translate([0, 0, -SHEET_THICKNESS])
-        cube([TOTAL_W, TOTAL_H, SHEET_THICKNESS]);
-    translate([0, 0, PLATE_THICKNESS])
-        cube([TOTAL_W, TOTAL_H, SHEET_THICKNESS]);
 }
