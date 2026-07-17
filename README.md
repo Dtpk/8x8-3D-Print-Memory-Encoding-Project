@@ -5,6 +5,8 @@ Update single write generator build in openscad is up you can either load this i
 
 If you wanna just hop right into a generator for the single use print here you go.
 
+
+Keychain hole and coin mode isn't in this version of the generator I will replace this link when I can the script is updated how ever so just heads up about the keychain mode.
 https://tinyurl.com/64byteGenerator
 
 Keychain size is 32mm by 32mm 0.4mm height printed with no infill but might be better with it I have not tried yet.
