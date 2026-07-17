@@ -1,23 +1,32 @@
 // --- 1. USER INPUT ---
 YOUR_TEXT = "testingsquare"; 
+SHAPE_STYLE = "square"; // Toggle between "square" and "round"
 
 // --- 2. HARDWARE TOGGLES ---
-ENABLE_KEYCHAIN_HOLE = true; // Set to true to test the cut-through
-ENABLE_RAISED_NOTCH  = true; // This now generates the "L" Frame around the first bit
+ENABLE_KEYCHAIN_HOLE = false; 
+ENABLE_RAISED_NOTCH  = true; // Generates the "L" Frame around the first bit
 
 // --- 3. CONFIGURATION ---
 GRID_SIZE = 8;
 CELL_SIZE = 4.0;       // 4mm grid cell spacing
-PLATE_THICKNESS = 0.5;   // determines how thick you should do final top bottom layer adjustment in the slicer
-SHEET_THICKNESS = 0.4; 
+PLATE_THICKNESS = 0.5;   // Determines main plate thickness
+SHEET_THICKNESS = 0.4;   // Determines transparent sheet thickness
 
 PELLET_HOLE_R = 1.0;  
 DASH_W = 2.0;          
 DASH_H = 0.6;          
 
+// Grid bounding dimensions
+GRID_W = GRID_SIZE * CELL_SIZE;
+GRID_H = GRID_SIZE * CELL_SIZE;
+
+// Margins and total sizing depending on shape and keychain
 BORDER = ENABLE_KEYCHAIN_HOLE ? 4.0 : 0.0;
-TOTAL_W = (GRID_SIZE * CELL_SIZE) + BORDER;
-TOTAL_H = GRID_SIZE * CELL_SIZE;
+TOTAL_W = GRID_W + BORDER;
+TOTAL_H = GRID_H;
+
+// Center calculation for round version (gives enough padding for the grid + keychain)
+ROUND_R = (SHAPE_STYLE == "round") ? (max(TOTAL_W, TOTAL_H) * 0.707) + (ENABLE_KEYCHAIN_HOLE ? 2.0 : 0.0) : 0;
 
 // --- 4. AUDITED HUFFMAN KEY LOOKUP ---
 function get_huffman(char) = 
@@ -101,16 +110,43 @@ function get_bit(x, y) =
     let(bit_index = y * GRID_SIZE + x)
     bit_index < len(BIT_STREAM) ? BIT_STREAM[bit_index] : 0; 
 
+// --- Helper module to switch between plate shapes ---
+module base_shape(h) {
+    if (SHAPE_STYLE == "round") {
+        // Center the cylinder around the grid center for equal spacing
+        translate([TOTAL_W / 2, TOTAL_H / 2, 0])
+            cylinder(h = h, r = ROUND_R, $fn=100);
+    } else {
+        cube([TOTAL_W, TOTAL_H, h]);
+    }
+}
+
+// --- Helper for keychain hole positioning ---
+module keychain_hole_cutter(h) {
+    if (ENABLE_KEYCHAIN_HOLE) {
+        if (SHAPE_STYLE == "round") {
+            // Position the keychain hole near the top-left outer boundary of the circle
+            angle = 135; // Top-left direction
+            hole_dist = ROUND_R - 3.0; // Pushed near the edge
+            translate([TOTAL_W/2 + cos(angle)*hole_dist, TOTAL_H/2 + sin(angle)*hole_dist, -1])
+                cylinder(h = h, r = 1.25, $fn=30);
+        } else {
+            // Original top-left corner placement for square
+            translate([BORDER / 2, TOTAL_H - (BORDER / 2), -1])
+                cylinder(h = h, r = 1.25, $fn=30); 
+        }
+    }
+}
+
 // --- 6. 3D GEOMETRY GENERATOR ---
 union() {
     
-    // 1. MAIN BODY: Gray plate with data holes AND keychain hole subtracted
+    // 1. MAIN BODY: Gray plate with data holes and keychain hole
     color([0.2, 0.2, 0.2]) { 
         difference() {
-            // Raw Main Body Plate
-            cube([TOTAL_W, TOTAL_H, PLATE_THICKNESS]);
+            base_shape(PLATE_THICKNESS);
             
-            // Generate Data Holes (Only inside the main body)
+            // Generate Data Holes
             for (y = [0 : GRID_SIZE-1]) {
                 for (x = [0 : GRID_SIZE-1]) {
                     pos_x = (x * CELL_SIZE) + (CELL_SIZE / 2) + BORDER;
@@ -129,37 +165,31 @@ union() {
                 }
             }
             
-            // Keychain Hole cut through the main plate
-            if (ENABLE_KEYCHAIN_HOLE) {
-                translate([BORDER / 2, TOTAL_H - (BORDER / 2), -1])
-                    cylinder(h = PLATE_THICKNESS + 2, r = 1.25, $fn=30); 
-            }
+            // Subtraction of keychain hole from main body
+            keychain_hole_cutter(PLATE_THICKNESS + 2);
         }
     }
     
-    // 2. TRANSPARENT OVERLAYS: Clean solid sheets with ONLY the keychain hole cut out
+    // 2. TRANSPARENT OVERLAYS: Solid sheets with ONLY keychain hole cut out
     color([0, 1, 0, 0.2]) {
         difference() {
-            // Raw transparent sheets (grouped together)
             union() {
                 // Bottom sheet
                 translate([0, 0, -SHEET_THICKNESS])
-                    cube([TOTAL_W, TOTAL_H, SHEET_THICKNESS]);
+                    base_shape(SHEET_THICKNESS);
                 // Top sheet
                 translate([0, 0, PLATE_THICKNESS])
-                    cube([TOTAL_W, TOTAL_H, SHEET_THICKNESS]);
+                    base_shape(SHEET_THICKNESS);
             }
             
-            // Cut keychain hole through BOTH transparent sheets (if active)
-            if (ENABLE_KEYCHAIN_HOLE) {
-                total_depth = PLATE_THICKNESS + (SHEET_THICKNESS * 2) + 2;
-                translate([BORDER / 2, TOTAL_H - (BORDER / 2), -SHEET_THICKNESS - 1])
-                    cylinder(h = total_depth, r = 1.25, $fn=30); 
-            }
+            // Subtraction of keychain hole from transparent sheets
+            total_depth = PLATE_THICKNESS + (SHEET_THICKNESS * 2) + 4;
+            translate([0, 0, -SHEET_THICKNESS - 1])
+                keychain_hole_cutter(total_depth);
         }
     }
 
-    // 3. "L" FRAME BUMP: Positioned on top of the system
+    // 3. "L" FRAME BUMP: Positioned relative to grid (0,0) [Top-Left Data Position]
     if (ENABLE_RAISED_NOTCH) {
         color([0.8, 0.2, 0.2]) { // Highlighted Red in OpenSCAD
             // Left Vertical leg of the L
