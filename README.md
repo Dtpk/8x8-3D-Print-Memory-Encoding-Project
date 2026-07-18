@@ -1,4 +1,4 @@
-Update new gba rom version is avaliable I will make a gb and gbc version sometime soon too and port the upgraded decode menu to the other versions as well.
+Update new gba and gb rom version is avaliable! I will port the upgraded decode menu to the other versions as well.
 
 Some notes the gba rom was gonna be all hand made but a local llm busted this project out I checked it and did my own tweaks but for the most part I have gave it the same huffman key it will work with
 all the other versions of the software the llm made a better decode menu that is interactive if you want it and not when you don't with a live preview I am gonna try to go in and add this to the qbasic and or python builds when I can. Also the gba rom source code is avaliable sound needs to be fixed yet besides that fully usable without the sound right now, the grid background looks busy on a emulator on but real hardware and a ds and its fine not a problem.
