@@ -3,6 +3,8 @@ Update new gba and gb rom version is avaliable! I will port the upgraded decode 
 Some notes the gba rom was gonna be all hand made but a local llm busted this project out I checked it and did my own tweaks but for the most part I have gave it the same huffman key it will work with
 all the other versions of the software the llm made a better decode menu that is interactive if you want it and not when you don't with a live preview I am gonna try to go in and add this to the qbasic and or python builds when I can. Also the gba rom source code is avaliable sound needs to be fixed yet besides that fully usable without the sound right now, the grid background looks busy on a emulator on but real hardware and a ds and its fine not a problem.
 
+GBA version may get a 3D printer option it will let you set the temps home then print a already made square over otg to the 3D printer in my case the ender 3 this is all just for laughs but wanted to try and print over link cable connected to a pico to the machine no promises this build will get done and released but will do my best.
+
 So the .bas file is to be ran on DOS systems using qbasic. I am currently using qbasic 4.5.
 The .py can be launched in python under Windows or Linux and doesn't need any requirements.
 
