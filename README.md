@@ -5,6 +5,10 @@ all the other versions of the software the llm made a better decode menu that is
 
 GBA version has a 3D print mode now!!! Right now only marlin firmware and ender 3 build plates are set but any printer with marlin this should work this uses a pico to connect over otg Y cable so no board modifying needed or printer disassembly. If any one wishes to add features reach out but I will be making a new repository for a custom gcode converter and pre-made docker build environment so really anything can be printed not just these 32mm 8x8 grids and it will automatically compile the gba rom with it..
 
+<img width="1920" height="1080" alt="same" src="https://github.com/user-attachments/assets/bd1ace25-25f7-4b10-9edd-c9cda23de19b" />
+
+
+
 Really any openscad project that's basic might be convertible but yeah this 3D print gba rom generates its own bit grid from the encode menu of the rom. It uses a handshake and is 1 to 1 real time so when bit section is hit it is normal to slow down and it is normal if you hit print while not connected to the machine to freeze as of right now.
 
 GBA 3D printer steps!!!
