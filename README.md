@@ -5,7 +5,13 @@ all the other versions of the software the llm made a better decode menu that is
 
 GBA version has a 3D print mode now!!! Right now only marlin firmware and ender 3 build plates are set but any printer with marlin this should work this uses a pico to connect over otg Y cable so no board modifying needed or printer disassembly. If any one wishes to add features "cough keychain mode or top layer drawing" reach out but I will be making a new repository for a custom gcode converter and pre-made docker build environment so really anything can be printed not just these 32mm 8x8 grids and it will automatically convert gcode and compile the gba rom with it..
 
-<img width="1920" height="1080" alt="same" src="https://github.com/user-attachments/assets/bd1ace25-25f7-4b10-9edd-c9cda23de19b" />
+<!-- <img width="1920" height="1080" alt="same" src="https://github.com/user-attachments/assets/bd1ace25-25f7-4b10-9edd-c9cda23de19b" /> -->
+WATCH THE VIDEO TO LEARN MORE!!! " https://www.youtube.com/watch?v=pmB5uA4152c "
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=pmB5uA4152c">
+    <img src="https://github.com/user-attachments/assets/bd1ace25-25f7-4b10-9edd-c9cda23de19b" alt="Watch the video" width="900">
+  </a>
+</p>
 
 
 
