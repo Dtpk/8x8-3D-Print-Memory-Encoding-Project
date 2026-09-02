@@ -1,9 +1,7 @@
-# GBDK path
-GBDK_HOME = /home/daniel_sensenig/gbdk_toolchain/
+# GBDK path inside the Docker container
+GBDK_HOME = /opt/gbdk/
 
 CC = $(GBDK_HOME)bin/lcc
-
-# GBDK_PATH = /opt/gbdk/bin/
 
 CFLAGS = -Wa-l -Wl-m -Wl-j
 
